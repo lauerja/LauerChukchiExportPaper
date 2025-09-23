@@ -1,0 +1,73 @@
+2025-06-05 18:16:01,740:API_operations.helpers.JobService:INFO Creating job 153967
+2025-06-05 18:16:02,168:API_operations.exports.ForProject:INFO Input Param = {'collection_id': 0, 'project_id': 10683, 'exp_type': <ExportTypeEnum.general_tsv: 'TSV'>, 'use_latin1': False, 'tsv_entities': 'OPASC', 'only_annotations': False, 'split_by': 'sample', 'coma_as_separator': False, 'format_dates_times': True, 'with_images': False, 'with_internal_ids': False, 'with_types_row': False, 'only_first_image': False, 'sum_subtotal': <SummaryExportGroupingEnum.just_by_taxon: ''>, 'pre_mapping': {}, 'formulae': {}, 'out_to_ftp': False}
+2025-06-05 18:16:02,168:API_operations.exports.ForProject:INFO Input Param = {'collection_id': 0, 'project_id': 10683, 'exp_type': <ExportTypeEnum.general_tsv: 'TSV'>, 'use_latin1': False, 'tsv_entities': 'OPASC', 'only_annotations': False, 'split_by': 'sample', 'coma_as_separator': False, 'format_dates_times': True, 'with_images': False, 'with_internal_ids': False, 'with_types_row': False, 'only_first_image': False, 'sum_subtotal': <SummaryExportGroupingEnum.just_by_taxon: ''>, 'pre_mapping': {}, 'formulae': {}, 'out_to_ftp': False} project_ids = [10683]
+2025-06-05 18:16:02,181:API_operations.exports.ForProject:INFO Execute SQL : select obh.orig_id AS object_id, 
+                             obh.latitude AS object_lat, obh.longitude AS object_lon,
+                             TO_CHAR(obh.objdate,'YYYY-MM-DD') AS object_date,
+                             TO_CHAR(obh.objtime,'HH24:MI:SS') AS object_time,
+                             obh.object_link, obh.depth_min AS object_depth_min, obh.depth_max AS object_depth_max,
+                         
+                CASE obh.classif_qual
+                            WHEN 'V' then 'validated'
+                            WHEN 'P' then 'predicted'
+                            WHEN 'D' then 'dubious'
+                            ELSE obh.classif_qual
+                         END AS object_annotation_status,
+                         usr.name AS object_annotation_person_name, usr.email AS object_annotation_person_email,
+                         
+                    CASE WHEN obh.classif_qual IN ('V','D') THEN TO_CHAR(obh.classif_date,'YYYY-MM-DD') END AS object_annotation_date,
+                  CASE WHEN obh.classif_qual IN ('V','D') THEN TO_CHAR(obh.classif_date,'HH24:MI:SS') END AS object_annotation_time,
+                         txo.display_name AS object_annotation_category
+                    ,(WITH RECURSIVE rq(id, name, parent_id) 
+                   AS (SELECT id, name, parent_id, 1 AS rank 
+                         FROM taxonomy 
+                        WHERE id = obh.classif_id
+                       UNION
+                       SELECT txpr.id, txpr.name, txpr.parent_id, rank+1 AS rank 
+                         FROM rq 
+                         JOIN taxonomy txpr ON txpr.id = rq.parent_id)
+                    SELECT string_agg(name,'>') 
+                      FROM (SELECT name 
+                              FROM rq 
+                          ORDER BY rank desc) q) AS object_annotation_hierarchy
+, obh.complement_info
+ , obf.n01 AS "object_label", obf.n02 AS "object_width", obf.n03 AS "object_height", obf.n04 AS "object_bx", obf.n05 AS "object_by", obf.n06 AS "object_circ.", obf.n07 AS "object_area_exc", obf.n08 AS "object_area", obf.n09 AS "object_%area", obf.n10 AS "object_major", obf.n11 AS "object_minor", obf.n12 AS "object_y", obf.n13 AS "object_x", obf.n14 AS "object_convex_area", obf.n15 AS "object_perim.", obf.n16 AS "object_elongation", obf.n17 AS "object_perimareaexc", obf.n18 AS "object_perimmajor", obf.n19 AS "object_circex", obf.n20 AS "object_angle", obf.n21 AS "object_bounding_box_area", obf.n22 AS "object_eccentricity", obf.n23 AS "object_equivalent_diameter", obf.n24 AS "object_euler_number", obf.n25 AS "object_extent", obf.n26 AS "object_local_centroid_col", obf.n27 AS "object_local_centroid_row", obf.n28 AS "object_solidity", obf.n29 AS "object_meanhue", obf.n30 AS "object_meansaturation", obf.n31 AS "object_meanvalue", obf.n32 AS "object_stdhue", obf.n33 AS "object_stdsaturation", obf.n34 AS "object_stdvalue"
+, sam.orig_id AS sample_id, sam.dataportal_descriptor AS sample_dataportal_descriptor , sam.t01 AS "sample_project", sam.t02 AS "sample_ship", sam.t03 AS "sample_operator", sam.t04 AS "sample_sampling_gear", sam.t05 AS "sample_uuid", sam.t06 AS "sample_gear_net_opening"
+, prc.orig_id AS process_id , prc.t01 AS "process_pixel", prc.t02 AS "process_source", prc.t03 AS "process_commit", prc.t04 AS "process_datetime", prc.t05 AS "process_uuid", prc.t06 AS "process_1st_operation", prc.t07 AS "process_2nd_operation", prc.t08 AS "process_3rd_operation", prc.t09 AS "process_4th_operation", prc.t10 AS "process_5th_operation", prc.t11 AS "process_6th_operation", prc.t12 AS "process_7th_operation"
+, acq.orig_id AS acq_id, acq.instrument AS acq_instrument , acq.t01 AS "acq_instrument_id", acq.t02 AS "acq_celltype", acq.t03 AS "acq_minimum_mesh", acq.t04 AS "acq_maximum_mesh", acq.t05 AS "acq_volume", acq.t06 AS "acq_imaged_volume", acq.t07 AS "acq_magnification", acq.t08 AS "acq_fnumber_objective", acq.t09 AS "acq_camera", acq.t10 AS "acq_nb_frame", acq.t11 AS "acq_software", acq.t12 AS "acq_local_datetime", acq.t13 AS "acq_camera_resolution", acq.t14 AS "acq_camera_iso", acq.t15 AS "acq_camera_shutter_speed", acq.t16 AS "acq_uuid" FROM (select 10683 as projid) prjs
+ JOIN samples sam ON sam.projid = prjs.projid
+ JOIN acquisitions acq ON acq.acq_sample_id = sam.sampleid
+ JOIN process prc ON prc.processid = acq.acquisid
+ JOIN obj_head obh ON obh.acquisid = acq.acquisid
+ JOIN obj_field obf ON obf.objfid = obh.objid
+ LEFT JOIN taxonomy txo ON txo.id = obh.classif_id
+ LEFT JOIN users usr ON obh.classif_who = usr.id 
+ORDER BY sam.orig_id ASC, obh.objid ASC
+2025-06-05 18:16:02,182:API_operations.exports.ForProject:INFO Params : {'projid': '10683'}
+2025-06-05 18:16:05,863:API_operations.exports.ForProject:INFO Writing into temptask file data.tsv
+2025-06-05 18:16:06,003:API_operations.exports.ForProject:INFO Storing into zip as ecotaxa_9014.tsv
+2025-06-05 18:16:06,019:API_operations.exports.ForProject:INFO Writing into temptask file data.tsv
+2025-06-05 18:16:06,152:API_operations.exports.ForProject:INFO Storing into zip as ecotaxa_9015.tsv
+2025-06-05 18:16:06,183:API_operations.exports.ForProject:INFO Writing into temptask file data.tsv
+2025-06-05 18:16:06,381:API_operations.exports.ForProject:INFO Storing into zip as ecotaxa_9039.tsv
+2025-06-05 18:16:06,420:API_operations.exports.ForProject:INFO Writing into temptask file data.tsv
+2025-06-05 18:16:08,046:API_operations.exports.ForProject:INFO Row 10000 of max 16860
+2025-06-05 18:16:08,089:API_operations.exports.ForProject:INFO Storing into zip as ecotaxa_9049.tsv
+2025-06-05 18:16:08,408:API_operations.exports.ForProject:INFO Writing into temptask file data.tsv
+2025-06-05 18:16:08,763:API_operations.exports.ForProject:INFO Storing into zip as ecotaxa_9059.tsv
+2025-06-05 18:16:08,829:API_operations.exports.ForProject:INFO Writing into temptask file data.tsv
+2025-06-05 18:16:08,859:API_operations.exports.ForProject:INFO Storing into zip as ecotaxa_9071.tsv
+2025-06-05 18:16:08,864:API_operations.exports.ForProject:INFO Writing into temptask file data.tsv
+2025-06-05 18:16:08,934:API_operations.exports.ForProject:INFO Storing into zip as ecotaxa_9085.tsv
+2025-06-05 18:16:08,947:API_operations.exports.ForProject:INFO Writing into temptask file data.tsv
+2025-06-05 18:16:09,189:API_operations.exports.ForProject:INFO Storing into zip as ecotaxa_9101.tsv
+2025-06-05 18:16:09,236:API_operations.exports.ForProject:INFO Writing into temptask file data.tsv
+2025-06-05 18:16:09,383:API_operations.exports.ForProject:INFO Storing into zip as ecotaxa_9127.tsv
+2025-06-05 18:16:09,412:API_operations.exports.ForProject:INFO Writing into temptask file data.tsv
+2025-06-05 18:16:09,505:API_operations.exports.ForProject:INFO Storing into zip as ecotaxa_9137.tsv
+2025-06-05 18:16:09,523:API_operations.exports.ForProject:INFO Writing into temptask file data.tsv
+2025-06-05 18:16:09,797:API_operations.exports.ForProject:INFO Storing into zip as ecotaxa_9153.tsv
+2025-06-05 18:16:09,851:API_operations.exports.ForProject:INFO Writing into temptask file data.tsv
+2025-06-05 18:16:10,014:API_operations.exports.ForProject:INFO Storing into zip as ecotaxa_9185.tsv
+2025-06-05 18:16:10,045:API_operations.exports.ForProject:INFO Extracted 16860 rows
+2025-06-05 18:16:10,046:API_operations.exports.ForProject:INFO Log in zip should end here.
