@@ -1,2 +1,10 @@
 *.tsv
 *.csv
+*.nc
+*.xlsx
+*.png
+*.jpg
+*.jpeg
+*.tiff
+*.tif
+.DS_Store
