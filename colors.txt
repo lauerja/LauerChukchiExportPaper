@@ -1,0 +1,6 @@
+ice_class_colors = {'ow': "#44C7FF", 'miz': "#FCCE50", 'ice': "#d63a41"}
+t010_color = '#44C7FF'
+
+hr_color = "#2d981d"
+# hre_color = "#de9f5c"
+hre_color = "#00098C"
