@@ -1,16 +1,16 @@
 library(tidyverse)
 
-allTrapData <- read_csv('../../data_general/processed_data/all_trap_data_for_figs_3_4_5_6_7.csv')%>%
+allTrapData <- read_csv('../../data_directory/sediment_trap_data.csv')%>%
   mutate(trap_depth = Trap_Depth)
 
 wcTrapData <- allTrapData %>%
   filter(trap_depth >= 8)%>%
   drop_na(inFront)
 
-bridge_cam_ice <- read_csv('../../data_general/data_station_meta/observed_ice_edge_bridgecam_updated072425.csv')%>%
+bridge_cam_ice <- read_csv('../../data_directory/metadata/observed_ice_edge_bridgecam_updated072425.csv')%>%
   mutate(iceObs = ice_obs, .keep = 'unused')
 
-wcBiomass_allStations <- read_csv('../../data_general/processed_data/depth_integrated_biomass_full_wc_all_stations.csv')%>%
+wcBiomass_allStations <- read_csv('../../data_directory/ctd_and_water_column/depth_integrated_biomass_full_wc_all_stations.csv')%>%
   left_join(., bridge_cam_ice)
 
 wcBiomass_trapStations <- allTrapData %>%

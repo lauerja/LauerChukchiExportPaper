@@ -1,6 +1,6 @@
 library(tidyverse)
 
-allTrapData <- read_csv('../../data_general/processed_data/all_trap_data_for_figs_3_4_5_6_7.csv')%>%
+allTrapData <- read_csv('../../data_directory/sediment_trap_data.csv')%>%
   mutate(trap_depth = Trap_Depth)
 
 wcTrapData <- allTrapData %>%
@@ -23,7 +23,6 @@ trapMeans_for_reporting <- allTrapData %>%
 noFront <- filter(wcTrapData, inFront == F)
 
 # Does depth integrated POC correlate with fluxC outside the front? - YES Significant
-# p = 0.00132, adj R2 = .2499
 summary(lm(fluxC ~ diPOC_aboveTrap_mg_m2, noFront))#filter(wcTrapData, inFront ==F)))
 cor.test(noFront$fluxC, noFront$diPOC_aboveTrap_mg_m2, method = 'spearman')
 ggplot(wcTrapData, aes(x = diPOC_aboveTrap_mg_m2, y = fluxC, color = inFront))+
@@ -41,7 +40,6 @@ ggplot(., aes(x = diPOC_aboveTrap_mg_m2, y = fluxC, shape = inFront, color = ice
   geom_point()
 
 # Does depth integrated PON correlate with fluxN outside the front? - NO significant linear regression
-# p = .2194, R2 = .05743, adj R2 = .02118
 summary(lm(fluxN ~ diPON_aboveTrap_mg_m2, filter(wcTrapData, inFront ==F)))
 
 # Significant spearman correlation (p = 0.010)
@@ -54,7 +52,6 @@ ggplot(wcTrapData, aes(x = diPON_aboveTrap_mg_m2, y = fluxN, color = inFront))+
   geom_point()
 
 # Does diChl correlate with fluxChl outside the front? - YES Significant
-# p = 0.0005302, R2 = .3436, adjR2 = .3209
 summary(lm(fluxChl ~ diChl_aboveTrap_mg_m2, filter(wcTrapData, inFront ==F)))
 
 cor.test(filter(wcTrapData, inFront == F)$fluxChl,
@@ -64,8 +61,7 @@ cor.test(filter(wcTrapData, inFront == F)$fluxChl,
 ggplot(wcTrapData, aes(x = diChl_aboveTrap_mg_m2, y = fluxChl, color = inFront))+
   geom_point()
 
-# Does diChl correlate with fluxChl overall? - NO but close
-# p = 0.07091, R2=0.07558, adjR2 = 0.05357
+# Does diChl correlate with fluxChl overall? - NO
 summary(lm(fluxChl ~ diChl_aboveTrap_mg_m2, wcTrapData))
 
 # Significant Spearman correlation
@@ -77,19 +73,16 @@ ggplot(wcTrapData, aes(x = diChl_aboveTrap_mg_m2, y = fluxChl))+
   geom_point()
 
 # Does diPOC correlate with fluxC overall? - NO
-# p=0.6135
 summary(lm(fluxC ~ diPOC_aboveTrap_mg_m2, wcTrapData))
 ggplot(wcTrapData, aes(x = diPOC_aboveTrap_mg_m2, y = fluxC))+
   geom_point()
 
 # Does diPON correlate with fluxN overall? - NO
-# p=0.5438
 summary(lm(fluxN ~ diPON_aboveTrap_mg_m2, wcTrapData))
 ggplot(wcTrapData, aes(x = diPON_aboveTrap_mg_m2, y = fluxN))+
   geom_point()
 
-# Sanity Check - Does lateral density grad significantly correlate with POC flux? - YES
-# p = 0.0001882, R2 = .2973, adjR2 = .2798
+# Does lateral density grad significantly correlate with POC flux? - YES
 summary(lm(fluxC ~ LateralDensityGrad, wcTrapData))
 ggplot(wcTrapData, aes(x = LateralDensityGrad, y = fluxC, color = iceObs))+
   geom_point()+
@@ -97,7 +90,6 @@ ggplot(wcTrapData, aes(x = LateralDensityGrad, y = fluxC, color = iceObs))+
   geom_smooth(method = 'lm', alpha = 0)
 
 # Does lateral density grad significantly correlate with PON flux? - YES
-# p = 0.00008876, R2 = .3221, adjR2 = .3051
 summary(lm(fluxN ~ LateralDensityGrad, wcTrapData))
 ggplot(wcTrapData, aes(x = LateralDensityGrad, y = fluxN, color = iceObs))+
   geom_point()+
@@ -105,7 +97,6 @@ ggplot(wcTrapData, aes(x = LateralDensityGrad, y = fluxN, color = iceObs))+
   geom_smooth(method = 'lm', alpha = 0)
 
 # Does lateral density grad significantly correlate with Chl flux? - YES
-# p = 0.00002448, R2 = .3487, adjR2 = .3332
 summary(lm(fluxChl ~ LateralDensityGrad, wcTrapData))
 wcTrapData%>%
   mutate(iceShift = paste(iceObs, '_', iceObsRecover))%>%
@@ -138,7 +129,7 @@ rSquared <- function(model){
   return(result)
 }
 
-## Ugly Plots for Publication ####
+## Plots for Publication ####
 noFront <- filter(wcTrapData, inFront == F)
 
 ## Plotting Flux by DIChl inside outside front
@@ -151,16 +142,12 @@ fluxChl_diChl_noFront_plot <- ggplot(wcTrapData,
                                      y = fluxChl))+
   geom_point(size = 5, aes(
     color = inFront,
-    # shape = iceObs
     ))+
-  # geom_point(size = 5)+
-  # geom_text(aes(label = Sample_Number))+
   geom_smooth(data = noFront,
               method = "lm",
-              formula = y ~ x, #*diChl_aboveTrap_mg_m2,
+              formula = y ~ x,
               alpha=0,
               linewidth = 2,
-              # color = wes_palette("Zissou1Continuous")[1])+
               color = 'black')+
   annotate("text",
            x = min(wcTrapData$diChl_aboveTrap_mg_m2, na.rm = TRUE),
@@ -177,12 +164,6 @@ fluxChl_diChl_noFront_plot <- ggplot(wcTrapData,
            y = max(wcTrapData$fluxChl, na.rm = TRUE),
            label = format(rSquared(fluxChl_diChl_noFront_model)),
            hjust = 1, vjust = 3, size = 10)+
-  # geom_text(aes(label = pValue(fluxChl_diChl_noFront_model),
-  #               x = -Inf, y = Inf, hjust = -0.2, vjust = 5),
-  #           size = 10)+
-  # geom_text(aes(label = rSquared(fluxChl_diChl_noFront_model),
-  #               x = -Inf, y = Inf, hjust = -0.15, vjust = 7),
-  #           size = 10)+
   xlab(bquote('Depth Integrated Chl '*italic(a)*' Above Trap ('*mg~m^-2*')'))+
   ylab(bquote('Chl '*italic(a)*' Flux ('*mg~m^-2~day^-1*')'))+
   scale_color_manual(values = c('black', 'orange'))+
@@ -212,39 +193,32 @@ fluxC_diPOC_noFront_plot <- ggplot(wcTrapData,
                                      y = fluxC))+
   geom_point(size = 5, aes(
     color = inFront, 
-    # shape = iceObs
     ))+
   geom_smooth(data = noFront,
               method = "lm",
-              formula = y ~ x, #*diChl_aboveTrap_mg_m2,
+              formula = y ~ x,
               alpha=0,
               linewidth = 2,
-              # color = wes_palette("Zissou1Continuous")[1],
               color = 'black')+
   annotate("text",
            x = min(wcTrapData$diPOC_aboveTrap_mg_m2, na.rm = TRUE),
            y = max(wcTrapData$fluxC, na.rm = TRUE),
            label = 'b',
            hjust = 0, vjust = 1, size = 10)+
-  annotate("text",
-           x = max(wcTrapData$diPOC_aboveTrap_mg_m2, na.rm = TRUE),
-           y = max(wcTrapData$fluxC, na.rm = TRUE),
-           label = pValue(fluxC_diPOC_noFront_model),
-           hjust = 1, vjust = 1, size = 10)+
-  annotate("text",
-           x = max(wcTrapData$diPOC_aboveTrap_mg_m2, na.rm = TRUE),
-           y = max(wcTrapData$fluxC, na.rm = TRUE),
-           label = format(rSquared(fluxC_diPOC_noFront_model)),
-           hjust = 1, vjust = 3, size = 10)+
-  # geom_text(aes(label = pValue(fluxC_diPOC_noFront_model),
-  #               x = -Inf, y = Inf, hjust = -0.2, vjust = 5),
-  #           size = 10)+
-  # geom_text(aes(label = rSquared(fluxC_diPOC_noFront_model),
-  #               x = -Inf, y = Inf, hjust = -0.15, vjust = 7),
-  #           size = 10)+
+  ### Not Significant, so text does not go on plot
+  ### Uncomment this block to print text
+  # annotate("text",
+  #          x = max(wcTrapData$diPOC_aboveTrap_mg_m2, na.rm = TRUE),
+  #          y = max(wcTrapData$fluxC, na.rm = TRUE),
+  #          label = pValue(fluxC_diPOC_noFront_model),
+  #          hjust = 1, vjust = 1, size = 10)+
+  # annotate("text",
+  #          x = max(wcTrapData$diPOC_aboveTrap_mg_m2, na.rm = TRUE),
+  #          y = max(wcTrapData$fluxC, na.rm = TRUE),
+  #          label = format(rSquared(fluxC_diPOC_noFront_model)),
+  #          hjust = 1, vjust = 3, size = 10)+
   xlab(bquote('Depth Integrated POC Above Trap ('*mg~m^-2*')'))+
   ylab(bquote('POC Flux ('*mg~m^-2~day^-1*')'))+
-  # scale_color_manual(values = wes_palette('Zissou1')[c(1, 5)])+
   scale_color_manual(values = c('black', 'orange'))+
   theme_classic()+
   theme(
@@ -287,12 +261,16 @@ fluxN_diPON_noFront_plot <- ggplot(wcTrapData,
   #             alpha=0,
   #             linewidth = 2,
   #             color = wes_palette("Zissou1Continuous")[1])+
-  # geom_text(aes(label = pValue(fluxN_diPON_noFront_model),
-  #               x = -Inf, y = Inf, hjust = -0.2, vjust = 5),
-  #           size = 10)+
-  # geom_text(aes(label = rSquared(fluxN_diPON_noFront_model),
-  #               x = -Inf, y = Inf, hjust = -0.15, vjust = 7),
-  #           size = 10)+
+  annotate("text",
+           x = max(wcTrapData$diPON_aboveTrap_mg_m2, na.rm = TRUE),
+           y = max(wcTrapData$fluxN, na.rm = TRUE),
+           label = pValue(fluxN_diPON_noFront_model),
+           hjust = 1, vjust = 1, size = 10)+
+  annotate("text",
+           x = max(wcTrapData$diPON_aboveTrap_mg_m2, na.rm = TRUE),
+           y = max(wcTrapData$fluxN, na.rm = TRUE),
+           label = format(rSquared(fluxN_diPON_noFront_model)),
+           hjust = 1, vjust = 3, size = 10)+
   xlab(bquote('Depth Integrated PON Above Trap ('*mg~m^-2*')'))+
   ylab(bquote('PON Flux ('*mg~m^-2~day^-1*')'))+
   labs(color = NULL)+

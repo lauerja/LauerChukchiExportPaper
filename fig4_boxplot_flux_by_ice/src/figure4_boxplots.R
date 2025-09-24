@@ -1,6 +1,6 @@
 library(tidyverse)
 
-flux_grad <- read_csv('../../data_general/processed_data/all_trap_data_for_figs_3_4_5_6_7.csv')
+flux_grad <- read_csv('../../data_directory/sediment_trap_data.csv')
 
 flux_grad_wcOnly <- filter(flux_grad, depth >= 8)
 
@@ -116,24 +116,3 @@ ggsave(plot = n_boxplot,
        height = 6, width = 4.5, dpi = 600,
        # height = 7, width = 6, dpi = 600,
        bg = 'transparent')
-
-### Gradient Boxplot
-grad_boxplot <- ggplot(flux_grad,
-                       aes(x = iceObs,
-                           y = LateralDensityGrad * 1000,
-                           color = depthCat))+
-  geom_boxplot()+
-  geom_point()+
-  geom_hline(yintercept = 10, color = 'green')+
-  scale_x_discrete(labels=c('ice' = 'Consolidated Ice',
-                            'miz' = 'Marginal Ice Zone\n(Front)',
-                            'ow' = 'Open Water'))+
-  labs(x = 'Deployment Station Ice Coverage',
-       # y = bquote('Mean Gradient Above Trap ('*kg*~m^-3*~km^-1*')'),
-       # y = bquote('Lateral Density Gradient at Trap Deployment Position ('*kg*~m^-3*~km^-1*')'),
-       y = bquote('Lateral Density Gradient at Trap Deployment Position ('*kg*~m^-4*')'),
-       color = 'Trap Depth')+
-  # scale_color_manual(values = c("#d63a41","#FCCE50", "#44C7FF"))+
-  theme_classic()
-
-grad_boxplot
