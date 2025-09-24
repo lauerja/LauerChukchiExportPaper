@@ -1,6 +1,6 @@
 library(tidyverse)
 
-data <- read_csv('../../data_general/processed_data/all_trap_data_for_figs_3_4_5_6_7.csv')
+data <- read_csv('../../data_directory/sediment_trap_data.csv')
 
 data_slim <- data %>%
   select(Sample_Number, Deployment, depth, depthCat, transect, iceObs,
@@ -151,15 +151,17 @@ di_mean_by_ice <- mean_sd_by_ice <- data_slim %>%
 
 #### Tables 1 and 2 ####
 lat_lon <- data %>%
-  select(Deployment, LATITUDE, LONGITUDE)%>%
+  mutate(latitude = deployLat,
+         longitude = deployLon)%>%
+  select(Deployment, latitude, longitude)%>%
   drop_na()%>%
   unique()
 
-table_metadata <- read_csv('../../data_general/data_station_meta/trap_metadata.csv')%>%
+table_metadata <- read_csv('../../data_directory/metadata/trap_metadata.csv')%>%
   select(Deployment, Deploy_Date_Local, Recover_Date_Local) %>%
   unique()%>%
   right_join(., lat_lon)%>%
-  select(Deployment, LATITUDE, LONGITUDE, Deploy_Date_Local, Recover_Date_Local)%>%
+  select(Deployment, latitude, longitude, Deploy_Date_Local, Recover_Date_Local)%>%
   drop_na()%>%
   unique()
 
@@ -180,7 +182,7 @@ table_data <- data %>%
 # note: pivot Trap_Depth, LateralDensityGrad wider so shallow and deep are separate columns
 table1 <- table_data %>%
   select(iceObs, iceTethered, Deployment, Trap_Depth_Shallow, Trap_Depth_Deep,
-         LATITUDE, LONGITUDE, Deploy_Date_Local, Recover_Date_Local,
+         latitude, longitude, Deploy_Date_Local, Recover_Date_Local,
          iceObsRecover, LateralDensityGrad_Shallow, LateralDensityGrad_Deep)
 
 table2 <- table_data %>%

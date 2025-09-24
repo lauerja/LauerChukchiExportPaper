@@ -2,16 +2,14 @@ library(tidyverse)
 library(vegan)
 library(plotly)
 library(RVAideMemoire)
-library(wesanderson)
 
 #### Read in STACANI and Other Metadata ####
-# iceObserved <- read_csv('../data/bridge_cam_ice_labels_041124.csv')%>%
-iceObserved <- read_csv('../../data_general/data_station_meta/observed_ice_edge_bridgecam_updated072425.csv')%>%
+iceObserved <- read_csv('../../data_directory/metadata/observed_ice_edge_bridgecam_updated072425.csv')%>%
   mutate(ice_class = ice_obs)%>%
   select(station, ice_class)%>%
   mutate(ice_class = ifelse(station == 29, 'miz', ice_class))
 
-stacani_trap <- read_csv('../data/trap_stacani.csv')%>%
+stacani_trap <- read_csv('../../data_directory/metadata/trap_stacani.csv')%>%
   mutate(sample_id = Sample_Number,
          deployment = Deployment,
          depth = Trap_Depth,
@@ -26,28 +24,8 @@ stacani_trap <- read_csv('../data/trap_stacani.csv')%>%
   # select(sample_id, deployment, station_deploy, station_recover, station, Deploy_Type, Trap_Depth, depthCat)%>%
   left_join(., iceObserved)
 
-# write_csv(stacani_trap, '../../trapAnalysis_byLap/grc25_map_figure/data/trap_stacani.csv')
-
-#### Read in Data ####
-# trap <- read_csv('../processed_data/trap_ecotaxa_export_with_biovolume_threshold97_method.csv')%>%
-#   left_join(., stacani_trap)%>%
-#   mutate(sample_id = as.character(sample_id),
-#          sample_type = 'trap',
-#          unique_id = paste(deployment, depthCat, 'trap', depth, sep = '_'),
-#          # nmds_group = paste(depthCat, 'trap', sep = '_'))%>%
-#          # nmds_group = paste(ice_class, depthCat, 'trap', sep = '_'))%>%
-#          nmds_group = paste(ice_class, 'trap', sep = '_'))%>%
-#   # filter(depthCat != 'ice')%>%
-#   # filter(ice_class == 'ice')%>%
-#   # filter(ice_class == 'miz')%>%
-#   # filter(ice_class == 'ow')%>%
-#   group_by(unique_id, sample_type, ice_class, depthCat, nmds_group, general_annotation_category)%>%
-#   summarise(count = n(),
-#             biovolume = sum(biovolume_mL_L))%>%
-#   ungroup()
-
 #### Hierarchical Data ####
-trap <- read_csv('../processed_data/trap_ecotaxa_export_with_biovolume_threshold97_method.csv')%>%
+trap <- read_csv('../../data_directory/taxonomy/trap_ecotaxa_export_with_biovolume_threshold97_method.csv')%>%
   left_join(., stacani_trap)%>%
   mutate(
     sample_id = as.character(sample_id),
@@ -111,7 +89,6 @@ trap <- read_csv('../processed_data/trap_ecotaxa_export_with_biovolume_threshold
   ) %>%
   mutate(
     across(liveCell:species, ~ replace_na(.x, "Unclassified")),
-    # genus = ifelse(clade == 'Bacillariophyta', paste(genus, '(Diatom)'), genus)
   )%>%
   filter(
          object_annotation_category != 'transparent',
@@ -125,10 +102,6 @@ trap <- read_csv('../processed_data/trap_ecotaxa_export_with_biovolume_threshold
 #### Prepare Matrices ####
 
 data <- trap %>%
-  # filter(general_annotation_category != 'bubble',
-  #        # general_annotation_category != 'detritus',
-  #        # general_annotation_category != 'unidentified cells',
-  #        general_annotation_category != 'transparent')%>%
   group_by(unique_id)%>%
   mutate(totalBV = sum(biovolume),
          relative_biovolume = biovolume / totalBV)%>%
@@ -196,9 +169,7 @@ nmds_df <- as.data.frame(test_NMDS$points) %>%
 
 # Plot
 nmds_plot <- ggplot(nmds_df, aes(x = MDS1, y = MDS2,
-                    # color = depthCat,
-                    color = ice_class))+ #,
-                    # shape = depthCat)) +
+                    color = ice_class))+
   geom_point(size = 3) +
   stat_ellipse(geom = "polygon", type = 't', alpha = 0, aes(color = ice_class, group = ice_class)) +
   # stat_ellipse(geom = "polygon", type = 't', alpha = 0.2, aes(fill = depthCat, group = depthCat), color = NA) +
@@ -207,14 +178,6 @@ nmds_plot <- ggplot(nmds_df, aes(x = MDS1, y = MDS2,
                               'miz' = 'Marginal Ice Zone',
                               'ow' = 'Open Water'),
                      name = 'Ice Coverage')+
-  # scale_fill_manual(values = wes_palette('Zissou1')[c(1, 3, 5)],
-  #                   labels=c('ice' = 'Consolidated Ice',
-  #                            'miz' = 'Marginal Ice Zone',
-  #                            'ow' = 'Open Water'),
-  #                   name = 'Ice Coverage')+
-  # scale_fill_discrete(labels=c('ice' = 'Consolidated Ice',
-  #                              'miz' = 'Marginal Ice Zone\n(Front)',
-  #                              'ow' = 'Open Water'))+
   theme_minimal()
 
 nmds_plot
@@ -222,30 +185,6 @@ nmds_plot
 
 ggsave('../plot/trap_nmds.jpeg', nmds_plot,
        height = 6, width = 7, dpi = 600)
-
-# 3d Plot
-
-# # Prepare data for 3D plotting
-# nmds_df <- as.data.frame(test_NMDS$points) %>%
-#   mutate(nmds_group = nmds_groups)%>%
-#   rownames_to_column('unique_id')
-# 
-# # Create a 3D scatter plot
-# plot_ly(nmds_df,
-#         x = ~MDS1, y = ~MDS2, z = ~MDS3,
-#         color = ~ice_class,
-#         # color = ~depthCat,
-#         # symbol = ~depthCat,
-#         # colors = "Set2",
-#         type = 'scatter3d',
-#         mode = 'markers+text',
-#         marker = list(size = 5) #,
-#         # text= ~nmds_df$unique_id
-#         ) %>%
-#   layout(scene = list(xaxis = list(title = 'MDS1'),
-#                       yaxis = list(title = 'MDS2'),
-#                       zaxis = list(title = 'MDS3')),
-#          legend = list(title = list(text = 'NMDS Group')))
 
 #### Stats (PERMANOVA) ####
 # Create a data frame for nmds groups with proper column naming
@@ -257,8 +196,6 @@ distance_matrix <- vegdist(biovolume, method = "bray")
 
 # Run PERMANOVA using Bray-Curtis distance
 permanova_result <- adonis2(distance_matrix ~ ice_class,
-# permanova_result <- adonis2(distance_matrix ~ ice_class * depthCat,
-# permanova_result <- adonis2(distance_matrix ~ depthCat, 
                             data = nmds_groups_df, 
                             method = 'bray', 
                             permutations = 999)

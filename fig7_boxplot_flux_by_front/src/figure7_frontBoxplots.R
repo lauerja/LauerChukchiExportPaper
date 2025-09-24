@@ -1,7 +1,7 @@
 # source('compare_flux_and_gradient.R')
 library(tidyverse)
 
-flux_grad <- read_csv('../../data_general/processed_data/all_trap_data_for_figs_3_4_5_6_7.csv')
+flux_grad <- read_csv('../../data_directory/sediment_trap_data.csv')
 
 flux_grad_wcOnly <- filter(flux_grad, depth >= 8)
 

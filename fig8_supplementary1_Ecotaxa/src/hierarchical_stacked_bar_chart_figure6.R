@@ -1,6 +1,88 @@
-# source('./ecotaxa_analysis_from_biovolume.R')
-# library(viridis)
+library(tidyverse)
 library(scales)
+
+#### Read in STACANI and Other Metadata ####
+iceObserved <- read_csv('../../data_directory/metadata/observed_ice_edge_bridgecam_updated072425.csv')%>%
+  mutate(ice_class = ice_obs)%>%
+  select(station, ice_class)%>%
+  mutate(ice_class = ifelse(station == 29, 'miz', ice_class))
+
+stacani_ctd <- read_csv('../../data_directory/metadata/stacani.csv')%>%
+  mutate(station = sta,
+         cast = ca,
+         depth = ni,
+         sample_id = samp,
+         .keep = 'unused')%>%
+  left_join(iceObserved)
+
+stacani_trap <- read_csv('../../data_directory/metadata/trap_stacani.csv')%>%
+  mutate(sample_id = Sample_Number,
+         deployment = Deployment,
+         depth = Trap_Depth,
+         depthCat = ifelse(Trap_Depth < 5, 'ice',
+                           ifelse(Trap_Depth < 20, 'shallow', 'deep')),
+         station_deploy = Deploy_Station,
+         station_recover = Recover_Station,
+         .keep = 'none')
+
+stacani_trap_deploy_focus <- stacani_trap%>%
+  mutate(station = station_deploy)%>%
+  left_join(., iceObserved)%>%
+  select(sample_id, deployment, station, depth, depthCat, ice_class)
+
+stacani_trap_recover_focus <- stacani_trap%>%
+  mutate(station = station_recover)%>%
+  left_join(., iceObserved)%>%
+  select(sample_id, deployment, station, depth, depthCat, ice_class)
+
+stacani_trap_overall <- stacani_trap%>%
+  left_join(., mutate(iceObserved, station_deploy = station, ice_class_deploy = ice_class, .keep='unused'))%>%
+  left_join(., mutate(iceObserved, station_recover = station, ice_class_recover = ice_class, .keep='unused'))
+
+planktoscope_log <- read_csv('../../data_directory/taxonomy/PlanktoScope Log Sheet - Source Samples-2.csv')%>%
+  mutate(sample_id = `(CTD/Ice/Experiment)\nArrigo Number`,
+         station_chr = `Station ID (or Local Sampling Timestamp)`,
+         cast = `(CTD/Net)\nCast Number`,
+         station_numeric = ifelse(str_detect(station_chr, '^S') == T, 
+                                  as.numeric(str_extract(station_chr, '(?<=S)\\d{3}')),
+                                  NA),
+         notes = `Sample collection notes`)
+
+stacani_iceCore <- filter(planktoscope_log, `Sample Type` == 'Ice Core')%>%
+  mutate(sample_id = as.numeric(sample_id),
+         station = station_numeric)%>%
+  select(sample_id, station, notes)
+
+trap_stations <- stacani_trap %>%
+  filter(station_deploy != 15)%>% # Drop the test trap
+  pull(station_deploy)%>%
+  unique(.)
+
+#### Read in Ecotaxa Data ####
+ecotaxa_ctd <- read.csv('../../data_directory/taxonomy/ctd_ecotaxa_export_with_biovolume_threshold97_method.csv')%>%
+  left_join(stacani_ctd)%>%
+  mutate(sample_id = as.character(sample_id),
+         sample_type = 'ctd',
+         unique_id = paste('ctdCast', cast, 'station', station, 'depth', depth, sep = '_'))%>%
+  select(-cast, -depth) #, -depthCat)
+
+
+ecotaxa_iceCore <- read.csv('../../data_directory/taxonomy/iceCore_ecotaxa_export_with_biovolume_threshold97_method.csv')%>%
+  left_join(stacani_iceCore)%>%
+  mutate(sample_id = as.character(sample_id),
+         ice_class = 'ice',
+         sample_type = 'ice_core',
+         unique_id = paste('ice_core_station', station))%>%
+  select(-notes)
+
+ecotaxa_trap <- read.csv('../../data_directory/taxonomy/trap_ecotaxa_export_with_biovolume_threshold97_method.csv')%>%
+  ungroup()%>%
+  left_join(stacani_trap_deploy_focus)%>%
+  mutate(sample_id = as.character(sample_id),
+         sample_type = paste(depthCat, 'trap', sep = '_'),
+         unique_id = paste(deployment, depthCat, 'trap', depth, sep = '_'))%>%
+  select(-deployment, -depth, -depthCat)
+
 
 ## Ensure Proper Classification of Traps
 miz_deployments <- c('T002', 'T005', 'T009')
@@ -95,11 +177,6 @@ relAbundance <- purrr::map_dfr(
   ~ ecotaxa_trapStations %>%
     group_by(ice_class, sample_type, !!sym(.x)) %>%
     summarize(category_bv = sum(biovolume_mL_L), .groups = "drop_last") %>%
-    # mutate(
-    #   relativeAbundance = category_bv / sum(category_bv),
-    #   tax_level = .x,
-    #   tax_name = !!sym(.x)
-    # ) %>%
     mutate(
       total_bv = sum(category_bv),
       total_bv_noDetritus = sum(if_else(
@@ -121,10 +198,6 @@ relAbundance <- purrr::map_dfr(
 
 tailGroups<- relAbundance %>%
   filter(tax_level == 'genus')%>%
-  # group_by(ice_class, sample_type, tax_level) %>%
-  # mutate(
-  #   tailGroup = if_else(relativeAbundance < 0.02, T, F)
-  # )%>%
   group_by(tax_name)%>%
   mutate(tailGroup = ifelse(mean(relativeAbundance) < 0.01, T, F))%>%
   ungroup()%>%
@@ -134,13 +207,8 @@ tailGroups<- relAbundance %>%
 
 
 relAbundance_all <- relAbundance %>%
-  # group_by(ice_class, sample_type, tax_level) %>%
-  # mutate(
-  #   tax_name = if_else(relativeAbundance < 0.02, "Other", as.character(tax_name))
-  # ) %>%
   group_by(tax_name, tax_level)%>%
   mutate(tax_name = ifelse(max(relativeAbundance) <= 0.02, 'Other', as.character(tax_name)))%>%
-  # mutate(tax_name = ifelse(mean(relativeAbundance) <= 0.02, 'Other', as.character(tax_name)))%>%
   # Recompute totals if you want the pooled "Other" to include all low-abundance taxa
   group_by(ice_class, sample_type, tax_level, tax_name) %>%
   summarize(category_bv = sum(category_bv, na.rm = TRUE),
@@ -205,7 +273,7 @@ walk(tax_levels, function(level) {
   
   print(p)
   # Optional: save each plot
-  ggsave(filename = paste0("../relAbundance_plots/relAbundance_", level, ".png"), plot = p, width = 8, height = 5)
+  # ggsave(filename = paste0("../relAbundance_plots/relAbundance_", level, ".png"), plot = p, width = 8, height = 5)
 })
 
 ### No detritus version ###
@@ -243,7 +311,7 @@ walk(tax_levels, function(level) {
   
   print(p)
   # Optional: save each plot
-  ggsave(filename = paste0("../relAbundance_plots/relAbundance_", level, "_noDetritus.png"), plot = p, width = 8, height = 5)
+  # ggsave(filename = paste0("../relAbundance_plots/relAbundance_", level, "_noDetritus.png"), plot = p, width = 8, height = 5)
 })
 
 ## Genus Level Plot Only ##
@@ -256,8 +324,7 @@ other_taxa <- setdiff(unique(genus_relAbundance$tax_name), c("Unclassified", "Ot
 tax_order <- c("Detritus", "Unclassified", "Other", sort(other_taxa))
 genus_relAbundance <- genus_relAbundance %>% mutate(tax_name = factor(tax_name, levels = tax_order))
   
-# Create color palette: plasma for other taxa, fixed colors for Detritus/Unclassified
-# palette <- viridis::viridis(n = length(other_taxa), option = "plasma")
+# Create color palette:
 palette <- c(
   "#a6cee3", # light blue
   "#1f78b4", # dark blue
