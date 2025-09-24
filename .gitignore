@@ -7,4 +7,6 @@
 *.jpeg
 *.tiff
 *.tif
+data_directory/*
+*.zip
 .DS_Store
