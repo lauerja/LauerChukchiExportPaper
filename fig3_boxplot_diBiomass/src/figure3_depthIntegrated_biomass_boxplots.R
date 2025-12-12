@@ -168,11 +168,13 @@ atChl <- filter(wcTrapData_long, variable == 'Chl')%>%
   ylab(bquote('Depth-integrated Chl '*italic(a)*' ('*mg~m^-2*')'))+
   xlab(NULL)+
   theme_classic() +
-  theme(text = element_text(size = 16), legend.position = 'none',
-        panel.background = element_rect(fill = "transparent", color = NA),
-        plot.background = element_rect(fill = "transparent", color = NA),
-        legend.background = element_rect(fill = "transparent", color = NA),
-        legend.box.background = element_rect(fill = "transparent", color = NA)
+  theme(
+    text = element_text(size = 16),
+    legend.position = 'none',
+    panel.background = element_rect(fill = "transparent", color = NA),
+    plot.background = element_rect(fill = "transparent", color = NA),
+    legend.background = element_rect(fill = "transparent", color = NA),
+    legend.box.background = element_rect(fill = "transparent", color = NA)
   )
 atChl
 
