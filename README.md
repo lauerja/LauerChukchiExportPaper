@@ -1,4 +1,4 @@
-Code used for data processing and figure generation
+Code used for data analysis and figure generation in the manuscript "Sediment Trap Deployments Demonstrate Enhanced Export Driven by Frontal Dynamics in the Chukchi Sea"
 
 Each figure specific subdirectory contains a src folder with the script(s) used to make the figure
 and a plot folder where figure panels are saved.
