@@ -17,13 +17,24 @@ data_prepped <- flux_grad_wcOnly%>%
 pocFront <- ggplot(data_prepped,
                         aes(x = frontText,
                             y = fluxC,
-                            color = iceObs))+
-  geom_boxplot()+
+                            color = iceObs,
+                            fill = iceObs
+                            ))+
+  geom_boxplot(alpha = 0.4)+
   annotate("text",
            x = -Inf, y = Inf,
            label = "b",
            hjust = -1, vjust = 1, size = 10) +
-  scale_color_manual(values = c("#d63a41","#FCCE50","#44C7FF"),
+  scale_fill_manual(values = c(
+    "ice" = "#d63a41",
+    # "miz" = "#FCCE50",
+    "miz" = "#FFA500",
+    "ow" = "#44C7FF"
+  ),
+  labels=c('ice' = 'UI',
+           'miz' = 'MIZ',
+           'ow' = 'OW'))+
+  scale_color_manual(values = c("#d63a41","#FFA500","#44C7FF"),
                      labels=c('ice' = 'UI',
                               'miz' = 'MIZ',
                               'ow' = 'OW'))+
@@ -40,14 +51,25 @@ pocFront
 ponFront <- ggplot(data_prepped,
                    aes(x = frontText,
                        y=fluxN,
-                       color = iceObs))+
-  geom_boxplot()+
+                       color = iceObs,
+                       fill = iceObs
+                   ))+
+  geom_boxplot(alpha = 0.4)+
   annotate("text",
            x = -Inf, y = Inf,
            label = "c",
            hjust = -1, vjust = 1, size = 10) +
   labs(x = NULL, y = bquote('PON Flux ('*mg~m^-2~day^-1*')'))+
-  scale_color_manual(values = c("#d63a41","#FCCE50","#44C7FF"),
+  scale_fill_manual(values = c(
+    "ice" = "#d63a41",
+    # "miz" = "#FCCE50",
+    "miz" = "#FFA500",
+    "ow" = "#44C7FF"
+  ),
+  labels=c('ice' = 'UI',
+           'miz' = 'MIZ',
+           'ow' = 'OW'))+
+  scale_color_manual(values = c("#d63a41","#FFA500","#44C7FF"),
                      labels=c('ice' = 'UI',
                               'miz' = 'MIZ',
                               'ow' = 'OW'))+
@@ -63,14 +85,26 @@ ponFront
 chlFront <- ggplot(data_prepped,
                    aes(x = frontText,
                        y = fluxChl,
-                       color = iceObs))+
-  geom_boxplot()+
+                       color = iceObs,
+                       fill = iceObs
+                       ))+
+  geom_boxplot(alpha = 0.4)+
   annotate("text",
            x = -Inf, y = Inf,
            label = "a",
            hjust = -1, vjust = 1, size = 10) +
   labs(x = NULL, y = bquote('Chlorophyll '*italic(a)*' Flux ('*mg~m^-2~day^-1*')'))+
-  scale_color_manual(values = c("#d63a41","#FCCE50","#44C7FF"),
+  scale_fill_manual(values = c(
+    "ice" = "#d63a41",
+    # "miz" = "#FCCE50",
+    "miz" = "#FFA500",
+    "ow" = "#44C7FF"
+  ),
+  labels=c('ice' = 'UI',
+           'miz' = 'MIZ',
+           'ow' = 'OW'))+
+  scale_color_manual(values = c("#d63a41","#FFA500","#44C7FF"),
+  # scale_color_manual(values = c("#d63a41","#FCCE50","#44C7FF"),
                      labels=c('ice' = 'UI',
                               'miz' = 'MIZ',
                               'ow' = 'OW'))+

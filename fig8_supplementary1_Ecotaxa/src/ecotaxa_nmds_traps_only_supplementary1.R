@@ -173,7 +173,7 @@ nmds_plot <- ggplot(nmds_df, aes(x = MDS1, y = MDS2,
   geom_point(size = 3) +
   stat_ellipse(geom = "polygon", type = 't', alpha = 0, aes(color = ice_class, group = ice_class)) +
   # stat_ellipse(geom = "polygon", type = 't', alpha = 0.2, aes(fill = depthCat, group = depthCat), color = NA) +
-  scale_color_manual(values = c("#d63a41","#FCCE50","#44C7FF"),
+  scale_color_manual(values = c("#d63a41","#FFA500","#44C7FF"),
                      labels=c('ice' = 'Consolidated Ice',
                               'miz' = 'Marginal Ice Zone',
                               'ow' = 'Open Water'),

@@ -37,7 +37,7 @@ TukeyHSD(aov(dipon_full_waterCol_mg_m2~iceObs, wcBiomass_allStations))
 wcChl <- ggplot(wcBiomass_allStations,
                 aes(x = iceObs,
                     y = dichlMean_full_waterCol_mg_m2))+
-  geom_boxplot()+
+  geom_boxplot(size = 1)+
   theme_classic()+
   labs(title = 'All Box Stations diChl a')
 wcChl
@@ -47,7 +47,7 @@ wcC <- wcBiomass_allStations%>%
   ggplot(.,
          aes(x = iceObs,
              y = dipoc_full_waterCol_mg_m2))+
-  geom_boxplot()+
+  geom_boxplot(size = 1)+
   theme_classic()+
   labs(title = 'All Box Stations diPOC')
 wcC
@@ -55,7 +55,7 @@ wcC
 wcN <- ggplot(wcBiomass_allStations,
               aes(x = iceObs,
                   y = dipon_full_waterCol_mg_m2))+
-  geom_boxplot()+
+  geom_boxplot(size = 1)+
   theme_classic()+
   labs(title = 'All Box Stations diPON')
 wcN
@@ -102,13 +102,27 @@ wcTrapData_long <- wcTrapData %>%
 atC <- filter(wcTrapData_long, variable == 'POC')%>%
   ggplot(., aes(x = integration_depth_pretty,
                 y = value,
+                fill = iceObs,
                 color = iceObs))+
-  geom_boxplot()+
-  scale_color_manual(values = c(
-    "ice" = "#d63a41", 
-    "miz" = "#FCCE50",
+  geom_boxplot(alpha = 0.4)+
+  scale_fill_manual(values = c(
+    "ice" = "#d63a41",
+    # "miz" = "#FCCE50",
+    "miz" = "#FFA500",
     "ow" = "#44C7FF"
-  ))+
+  ),
+  labels=c('ice' = 'UI',
+           'miz' = 'MIZ',
+           'ow' = 'OW'))+
+  scale_color_manual(values = c(
+    "ice" = "#d63a41",
+    # "miz" = "#FCCE50",
+    "miz" = "#FFA500",
+    "ow" = "#44C7FF"
+  ),
+  labels=c('ice' = 'UI',
+           'miz' = 'MIZ',
+           'ow' = 'OW'))+
   annotate("text",
            x = -Inf, y = Inf,
            label = "b",
@@ -127,15 +141,27 @@ atC
 atN <- filter(wcTrapData_long, variable == 'PON')%>%
   ggplot(., aes(x = integration_depth_pretty,
                 y = value,
-                # fill = iceObs
-                color = iceObs
-  ))+
-  geom_boxplot()+
-  scale_color_manual(values = c(
-    "ice" = "#d63a41", 
-    "miz" = "#FCCE50",
+                fill = iceObs,
+                color = iceObs))+
+  geom_boxplot(alpha = 0.4)+
+  scale_fill_manual(values = c(
+    "ice" = "#d63a41",
+    # "miz" = "#FCCE50",
+    "miz" = "#FFA500",
     "ow" = "#44C7FF"
-  ))+
+  ),
+  labels=c('ice' = 'UI',
+           'miz' = 'MIZ',
+           'ow' = 'OW'))+
+  scale_color_manual(values = c(
+    "ice" = "#d63a41",
+    # "miz" = "#FCCE50",
+    "miz" = "#FFA500",
+    "ow" = "#44C7FF"
+  ),
+  labels=c('ice' = 'UI',
+           'miz' = 'MIZ',
+           'ow' = 'OW'))+
   annotate("text",
            x = -Inf, y = Inf,
            label = "c",
@@ -154,13 +180,27 @@ atN
 atChl <- filter(wcTrapData_long, variable == 'Chl')%>%
   ggplot(., aes(x = integration_depth_pretty,
                 y = value,
+                fill = iceObs,
                 color = iceObs))+
-  geom_boxplot()+
-  scale_color_manual(values = c(
-    "ice" = "#d63a41", 
-    "miz" = "#FCCE50",
+  geom_boxplot(alpha = 0.4)+
+  scale_fill_manual(values = c(
+    "ice" = "#d63a41",
+    # "miz" = "#FCCE50",
+    "miz" = "#FFA500",
     "ow" = "#44C7FF"
-  ))+
+  ),
+  labels=c('ice' = 'UI',
+           'miz' = 'MIZ',
+           'ow' = 'OW'))+
+  scale_color_manual(values = c(
+    "ice" = "#d63a41",
+    # "miz" = "#FCCE50",
+    "miz" = "#FFA500",
+    "ow" = "#44C7FF"
+  ),
+  labels=c('ice' = 'UI',
+           'miz' = 'MIZ',
+           'ow' = 'OW'))+
   annotate("text",
            x = -Inf, y = Inf,
            label = "a",

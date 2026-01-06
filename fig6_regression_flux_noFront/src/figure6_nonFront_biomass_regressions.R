@@ -164,7 +164,8 @@ fluxChl_diChl_noFront_plot <- ggplot(wcTrapData,
            y = max(wcTrapData$fluxChl, na.rm = TRUE),
            label = format(rSquared(fluxChl_diChl_noFront_model)),
            hjust = 1, vjust = 3, size = 10)+
-  xlab(bquote('Depth Integrated Chl '*italic(a)*' Above Trap ('*mg~m^-2*')'))+
+  # xlab(bquote('\nDepth Integrated Chl '*italic(a)*'\n Above Trap ('*mg~m^-2*')'))+
+  xlab(expression(atop("Depth Integrated Chl "*italic(a)*" Above Trap", "("*mg~m^-2*")")))+
   ylab(bquote('Chl '*italic(a)*' Flux ('*mg~m^-2~day^-1*')'))+
   scale_color_manual(values = c('black', 'orange'))+
   theme_classic()+
@@ -205,19 +206,18 @@ fluxC_diPOC_noFront_plot <- ggplot(wcTrapData,
            y = max(wcTrapData$fluxC, na.rm = TRUE),
            label = 'b',
            hjust = 0, vjust = 1, size = 10)+
-  ### Not Significant, so text does not go on plot
-  ### Uncomment this block to print text
-  # annotate("text",
-  #          x = max(wcTrapData$diPOC_aboveTrap_mg_m2, na.rm = TRUE),
-  #          y = max(wcTrapData$fluxC, na.rm = TRUE),
-  #          label = pValue(fluxC_diPOC_noFront_model),
-  #          hjust = 1, vjust = 1, size = 10)+
-  # annotate("text",
-  #          x = max(wcTrapData$diPOC_aboveTrap_mg_m2, na.rm = TRUE),
-  #          y = max(wcTrapData$fluxC, na.rm = TRUE),
-  #          label = format(rSquared(fluxC_diPOC_noFront_model)),
-  #          hjust = 1, vjust = 3, size = 10)+
-  xlab(bquote('Depth Integrated POC Above Trap ('*mg~m^-2*')'))+
+  annotate("text",
+           x = max(wcTrapData$diPOC_aboveTrap_mg_m2, na.rm = TRUE),
+           y = max(wcTrapData$fluxC, na.rm = TRUE),
+           label = pValue(fluxC_diPOC_noFront_model),
+           hjust = 1, vjust = 1, size = 10)+
+  annotate("text",
+           x = max(wcTrapData$diPOC_aboveTrap_mg_m2, na.rm = TRUE),
+           y = max(wcTrapData$fluxC, na.rm = TRUE),
+           label = format(rSquared(fluxC_diPOC_noFront_model)),
+           hjust = 1, vjust = 3, size = 10)+
+  # xlab(bquote('Depth Integrated POC Above Trap ('*mg~m^-2*')'))+
+  xlab(expression(atop("Depth Integrated POC Above Trap", "("*mg~m^-2*")")))+
   ylab(bquote('POC Flux ('*mg~m^-2~day^-1*')'))+
   scale_color_manual(values = c('black', 'orange'))+
   theme_classic()+
@@ -261,17 +261,18 @@ fluxN_diPON_noFront_plot <- ggplot(wcTrapData,
   #             alpha=0,
   #             linewidth = 2,
   #             color = wes_palette("Zissou1Continuous")[1])+
-  annotate("text",
-           x = max(wcTrapData$diPON_aboveTrap_mg_m2, na.rm = TRUE),
-           y = max(wcTrapData$fluxN, na.rm = TRUE),
-           label = pValue(fluxN_diPON_noFront_model),
-           hjust = 1, vjust = 1, size = 10)+
-  annotate("text",
-           x = max(wcTrapData$diPON_aboveTrap_mg_m2, na.rm = TRUE),
-           y = max(wcTrapData$fluxN, na.rm = TRUE),
-           label = format(rSquared(fluxN_diPON_noFront_model)),
-           hjust = 1, vjust = 3, size = 10)+
-  xlab(bquote('Depth Integrated PON Above Trap ('*mg~m^-2*')'))+
+  # annotate("text",
+  #          x = max(wcTrapData$diPON_aboveTrap_mg_m2, na.rm = TRUE),
+  #          y = max(wcTrapData$fluxN, na.rm = TRUE),
+  #          label = pValue(fluxN_diPON_noFront_model),
+  #          hjust = 1, vjust = 1, size = 10)+
+  # annotate("text",
+  #          x = max(wcTrapData$diPON_aboveTrap_mg_m2, na.rm = TRUE),
+  #          y = max(wcTrapData$fluxN, na.rm = TRUE),
+  #          label = format(rSquared(fluxN_diPON_noFront_model)),
+  #          hjust = 1, vjust = 3, size = 10)+
+  # xlab(bquote('Depth Integrated PON Above Trap ('*mg~m^-2*')'))+
+  xlab(expression(atop("Depth Integrated PON Above Trap", "("*mg~m^-2*")")))+
   ylab(bquote('PON Flux ('*mg~m^-2~day^-1*')'))+
   labs(color = NULL)+
   scale_color_manual(values = c('black', 'orange'),
@@ -295,3 +296,4 @@ ggsave("../plot/regression_pon_by_diPON_noFront_withKey.png",
        plot = fluxN_diPON_noFront_plot, 
        width = 7, height = 6, dpi = 600, 
        bg = "transparent")
+
