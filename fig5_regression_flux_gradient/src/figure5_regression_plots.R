@@ -136,6 +136,7 @@ chl_meanGradPlot <- ggplot(flux_grad_wcOnly,
            y = max(flux_grad_wcOnly$fluxChl, na.rm = TRUE),
            label = rSquared(chl_meanGrad),
            hjust = 0, vjust = 5, size = 10) +
+  scale_x_continuous(breaks = c(-0.04, -0.02, 0.00, 0.02, 0.04))+
   xlab(bquote('Lateral Density Gradient ('*kg~m^-3~km^-1*')'))+
   ylab(bquote('Chl '*italic(a)*' Flux ('*mg~m^-2~day^-1*')'))+
   theme_classic()+
