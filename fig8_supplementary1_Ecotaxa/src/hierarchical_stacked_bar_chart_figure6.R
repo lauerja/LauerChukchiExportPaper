@@ -224,8 +224,10 @@ relAbundance_all <- relAbundance %>%
                              "Ice Core" = "ice_core",
                              "Ice-tethered Trap" = "ice_trap",
                              'Water Column' = 'ctd',
-                             'Shallow Trap' = 'shallow_trap',
-                             'Deep Trap' = 'deep_trap'))
+                             'Upper Trap' = 'shallow_trap',
+                             'Lower Trap' = 'deep_trap'))
+                             # 'Shallow Trap' = 'shallow_trap',
+                             # 'Deep Trap' = 'deep_trap'))
 
 ### Faceted by classification level ###
 ggplot(relAbundance_all,
@@ -309,7 +311,7 @@ walk(tax_levels, function(level) {
     # ggtitle(paste("Relative Abundance at", level, "level"))+
     labs(x = NULL, y = NULL, fill = str_to_title(level))
   
-  print(p)
+  # print(p)
   # Optional: save each plot
   # ggsave(filename = paste0("../relAbundance_plots/relAbundance_", level, "_noDetritus.png"), plot = p, width = 8, height = 5)
 })

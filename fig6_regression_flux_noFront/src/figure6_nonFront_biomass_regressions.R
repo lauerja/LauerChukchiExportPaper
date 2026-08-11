@@ -1,4 +1,5 @@
 library(tidyverse)
+library(lmodel2)
 
 allTrapData <- read_csv('../../data_directory/sediment_trap_data.csv')%>%
   mutate(trap_depth = Trap_Depth)
@@ -23,13 +24,17 @@ trapMeans_for_reporting <- allTrapData %>%
 noFront <- filter(wcTrapData, inFront == F)
 
 # Does depth integrated POC correlate with fluxC outside the front? - YES Significant
-summary(lm(fluxC ~ diPOC_aboveTrap_mg_m2, noFront))#filter(wcTrapData, inFront ==F)))
+# summary(lm(fluxC ~ diPOC_aboveTrap_mg_m2, noFront))#filter(wcTrapData, inFront ==F)))
+lmodel2(fluxC ~ diPOC_aboveTrap_mg_m2, noFront)
 cor.test(noFront$fluxC, noFront$diPOC_aboveTrap_mg_m2, method = 'spearman')
 ggplot(wcTrapData, aes(x = diPOC_aboveTrap_mg_m2, y = fluxC, color = inFront))+
   geom_point()
 
+
 ## What about under ice?
 summary(lm(fluxC ~ diPOC_aboveTrap_mg_m2, filter(wcTrapData, iceObs == 'ow')))
+lmodel2(fluxC ~ diPOC_aboveTrap_mg_m2, filter(wcTrapData, iceObs == 'ow'))
+
 
 cor.test(filter(wcTrapData, iceObs =='ow')$fluxC,
          filter(wcTrapData, iceObs =='ow')$diPOC_aboveTrap_mg_m2,
@@ -41,6 +46,7 @@ ggplot(., aes(x = diPOC_aboveTrap_mg_m2, y = fluxC, shape = inFront, color = ice
 
 # Does depth integrated PON correlate with fluxN outside the front? - NO significant linear regression
 summary(lm(fluxN ~ diPON_aboveTrap_mg_m2, filter(wcTrapData, inFront ==F)))
+lmodel2(fluxN ~ diPON_aboveTrap_mg_m2, filter(wcTrapData, inFront ==F))
 
 # Significant spearman correlation (p = 0.010)
 cor.test(filter(wcTrapData, inFront == F)$fluxN,
@@ -53,6 +59,7 @@ ggplot(wcTrapData, aes(x = diPON_aboveTrap_mg_m2, y = fluxN, color = inFront))+
 
 # Does diChl correlate with fluxChl outside the front? - YES Significant
 summary(lm(fluxChl ~ diChl_aboveTrap_mg_m2, filter(wcTrapData, inFront ==F)))
+lmodel2(fluxChl ~ diChl_aboveTrap_mg_m2, filter(wcTrapData, inFront ==F))
 
 cor.test(filter(wcTrapData, inFront == F)$fluxChl,
          filter(wcTrapData, inFront == F)$diChl_aboveTrap_mg_m2,
@@ -63,6 +70,7 @@ ggplot(wcTrapData, aes(x = diChl_aboveTrap_mg_m2, y = fluxChl, color = inFront))
 
 # Does diChl correlate with fluxChl overall? - NO
 summary(lm(fluxChl ~ diChl_aboveTrap_mg_m2, wcTrapData))
+lmodel2(fluxChl ~ diChl_aboveTrap_mg_m2, wcTrapData)
 
 # Significant Spearman correlation
 cor.test(wcTrapData$fluxChl,
@@ -74,16 +82,21 @@ ggplot(wcTrapData, aes(x = diChl_aboveTrap_mg_m2, y = fluxChl))+
 
 # Does diPOC correlate with fluxC overall? - NO
 summary(lm(fluxC ~ diPOC_aboveTrap_mg_m2, wcTrapData))
+lmodel2(fluxC ~ diPOC_aboveTrap_mg_m2, wcTrapData)
+
 ggplot(wcTrapData, aes(x = diPOC_aboveTrap_mg_m2, y = fluxC))+
   geom_point()
 
 # Does diPON correlate with fluxN overall? - NO
 summary(lm(fluxN ~ diPON_aboveTrap_mg_m2, wcTrapData))
+lmodel2(fluxN ~ diPON_aboveTrap_mg_m2, wcTrapData)
+
 ggplot(wcTrapData, aes(x = diPON_aboveTrap_mg_m2, y = fluxN))+
   geom_point()
 
 # Does lateral density grad significantly correlate with POC flux? - YES
 summary(lm(fluxC ~ LateralDensityGrad, wcTrapData))
+lmodel2(fluxC ~ LateralDensityGrad, wcTrapData)
 ggplot(wcTrapData, aes(x = LateralDensityGrad, y = fluxC, color = iceObs))+
   geom_point()+
   geom_text(aes(label = Sample_Number))+
@@ -91,6 +104,7 @@ ggplot(wcTrapData, aes(x = LateralDensityGrad, y = fluxC, color = iceObs))+
 
 # Does lateral density grad significantly correlate with PON flux? - YES
 summary(lm(fluxN ~ LateralDensityGrad, wcTrapData))
+lmodel2(fluxN ~ LateralDensityGrad, wcTrapData)
 ggplot(wcTrapData, aes(x = LateralDensityGrad, y = fluxN, color = iceObs))+
   geom_point()+
   geom_text(aes(label = Sample_Number))+
@@ -98,6 +112,7 @@ ggplot(wcTrapData, aes(x = LateralDensityGrad, y = fluxN, color = iceObs))+
 
 # Does lateral density grad significantly correlate with Chl flux? - YES
 summary(lm(fluxChl ~ LateralDensityGrad, wcTrapData))
+lmodel2(fluxChl ~ LateralDensityGrad, wcTrapData)
 wcTrapData%>%
   mutate(iceShift = paste(iceObs, '_', iceObsRecover))%>%
   ggplot(., aes(x = LateralDensityGrad, y = fluxChl, color = iceShift))+
@@ -129,12 +144,40 @@ rSquared <- function(model){
   return(result)
 }
 
+## L2 Plotting ##
+rSquared_l2 <- function(r2){
+  # r2 <- summary(model)$r.squared
+  # r2 <- summary(model)$adj.r.squared
+  result <- paste('R\u00B2', signif(r2, digits = 2), sep='=')
+  return(result)
+}
+
+pValue_l2 <- function(pval){
+  # pval <- summary(model)$coef[2,4]
+  if(pval > 0.05){
+    return('Not Significant')
+  }else if(pval < 0.001){
+    return('p<0.001')
+  }else if(pval < 0.01){
+    return('p<0.01')
+  }else{
+    return('p<0.05')
+  }
+}
+
 ## Plots for Publication ####
 noFront <- filter(wcTrapData, inFront == F)
 
 ## Plotting Flux by DIChl inside outside front
 fluxChl_diChl_noFront_model <- lm(fluxChl ~ diChl_aboveTrap_mg_m2, noFront)
 summary(fluxChl_diChl_noFront_model)
+
+fluxChl_diChl_noFront_model_ii <- lmodel2(fluxChl ~ diChl_aboveTrap_mg_m2, 
+                                          noFront,
+                                          range.y = "relative",
+                                          range.x = "relative",
+                                          nperm = 99 )
+
 cor.test(noFront$fluxChl, noFront$diChl_aboveTrap_mg_m2, method = 'spearman')
 
 fluxChl_diChl_noFront_plot <- ggplot(wcTrapData,
@@ -272,8 +315,8 @@ fluxN_diPON_noFront_plot <- ggplot(wcTrapData,
   #          label = format(rSquared(fluxN_diPON_noFront_model)),
   #          hjust = 1, vjust = 3, size = 10)+
   # xlab(bquote('Depth Integrated PON Above Trap ('*mg~m^-2*')'))+
-  xlab(expression(atop("Depth Integrated PON Above Trap", "("*mg~m^-2*")")))+
-  ylab(bquote('PON Flux ('*mg~m^-2~day^-1*')'))+
+  xlab(expression(atop("Depth Integrated PN Above Trap", "("*mg~m^-2*")")))+
+  ylab(bquote('PN Flux ('*mg~m^-2~day^-1*')'))+
   labs(color = NULL)+
   scale_color_manual(values = c('black', 'orange'),
                      labels = c('TRUE'='Inside Front', 'FALSE'='Outside Front'))+

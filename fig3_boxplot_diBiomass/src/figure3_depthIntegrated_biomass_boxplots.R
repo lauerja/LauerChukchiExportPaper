@@ -166,7 +166,7 @@ atN <- filter(wcTrapData_long, variable == 'PON')%>%
            x = -Inf, y = Inf,
            label = "c",
            hjust = -1, vjust = 1, size = 10) +
-  ylab(bquote('Depth-integrated PON ('*mg~m^-2*')'))+
+  ylab(bquote('Depth-Integrated PN ('*mg~m^-2*')'))+
   xlab(NULL)+
   theme_classic() +
   theme(text = element_text(size = 16), legend.position = 'none',
