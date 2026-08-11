@@ -59,7 +59,7 @@ ponFront <- ggplot(data_prepped,
            x = -Inf, y = Inf,
            label = "c",
            hjust = -1, vjust = 1, size = 10) +
-  labs(x = NULL, y = bquote('PON Flux ('*mg~m^-2~day^-1*')'))+
+  labs(x = NULL, y = bquote('PN Flux ('*mg~m^-2~day^-1*')'))+
   scale_fill_manual(values = c(
     "ice" = "#d63a41",
     # "miz" = "#FCCE50",

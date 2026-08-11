@@ -89,7 +89,7 @@ n_boxplot <- ggplot(flux_grad,
                             'miz' = 'Marginal Ice\nZone',
                             'ow' = 'Open\nWater'))+
   labs(x = NULL, #'Deployment Station Ice Coverage',
-       y = bquote('PON Flux ('*mg~m^-2*~day^-1*')'),
+       y = bquote('PN Flux ('*mg~m^-2*~day^-1*')'),
        color = 'Trap Depth')+
   theme_classic()+
   theme(

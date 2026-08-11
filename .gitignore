@@ -9,4 +9,6 @@
 *.tif
 data_directory/*
 *.zip
+.RData
+.Rhistory
 .DS_Store

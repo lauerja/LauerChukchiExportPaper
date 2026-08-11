@@ -1,4 +1,5 @@
 library(tidyverse)
+library(lmodel2)
 
 flux_grad <- read_csv('../../data_directory/sediment_trap_data.csv')
 
@@ -19,8 +20,26 @@ pValue <- function(model){
 }
 
 rSquared <- function(model){
+  r2 <- summary(model)$r.squared
+  result <- paste('R\u00B2', signif(r2, digits = 2), sep='=')
+  return(result)
+}
+
+#### SMA regression annotation functions ####
+pValue_l2 <- function(pval){
+  if(pval > 0.05){
+    return('Not Significant')
+  }else if(pval < 0.001){
+    return('p<0.001')
+  }else if(pval < 0.01){
+    return('p<0.01')
+  }else{
+    return('p<0.05')
+  }
+}
+
+rSquared_l2 <- function(r2){
   # r2 <- summary(model)$r.squared
-  r2 <- summary(model)$adj.r.squared
   result <- paste('R\u00B2', signif(r2, digits = 2), sep='=')
   return(result)
 }
@@ -29,6 +48,9 @@ rSquared <- function(model){
 ## POC by gradient
 C_meanGrad <- lm(fluxC ~ LateralDensityGrad, flux_grad_wcOnly)
 summary(C_meanGrad)
+
+C_meanGrad_l2 <- lmodel2(fluxC ~ LateralDensityGrad, flux_grad_wcOnly)
+C_meanGrad_l2
 
 C_meanGradPlot <- ggplot(flux_grad_wcOnly,
                          aes(x = LateralDensityGrad,
@@ -40,6 +62,13 @@ C_meanGradPlot <- ggplot(flux_grad_wcOnly,
               alpha = 0,
               linewidth = 2,
               color = 'black')+
+  
+  # geom_abline(slope = C_meanGrad_l2$regression.results[3,]$Slope,
+  #             intercept = C_meanGrad_l2$regression.results[3,]$Intercept,
+  #             linewidth = 2,
+  #             linetype = 2,
+  #             color = 'gray')+
+  
   annotate("text",
            x = min(flux_grad_wcOnly$LateralDensityGrad, na.rm = TRUE),
            y = max(flux_grad_wcOnly$fluxC, na.rm = TRUE),
@@ -49,11 +78,13 @@ C_meanGradPlot <- ggplot(flux_grad_wcOnly,
            x = min(flux_grad_wcOnly$LateralDensityGrad, na.rm = TRUE),
            y = max(flux_grad_wcOnly$fluxC, na.rm = TRUE),
            label = pValue(C_meanGrad),
+           # label = pValue_l2(C_meanGrad_l2$P.param),
            hjust = 0, vjust = 3, size = 10) +
   annotate("text",
            x = min(flux_grad_wcOnly$LateralDensityGrad, na.rm = TRUE),
            y = max(flux_grad_wcOnly$fluxC, na.rm = TRUE),
            label = rSquared(C_meanGrad),
+           # label = rSquared_l2(C_meanGrad_l2$rsquare),
            hjust = 0, vjust = 5, size = 10) +
   scale_x_continuous(breaks = c(-0.04, -0.02, 0.00, 0.02, 0.04))+
   xlab(bquote('Lateral Density Gradient ('*kg~m^-3~km^-1*')'))+
@@ -71,6 +102,10 @@ C_meanGradPlot
 ## PON by gradient
 N_meanGrad <- lm(fluxN ~ LateralDensityGrad, flux_grad_wcOnly)
 summary(N_meanGrad)
+
+N_meanGrad_l2 <- lmodel2(fluxN ~ LateralDensityGrad, flux_grad_wcOnly)
+N_meanGrad_l2
+
 N_meanGradPlot <- ggplot(flux_grad_wcOnly,
                          aes(x = LateralDensityGrad,
                              y=fluxN))+
@@ -89,15 +124,17 @@ N_meanGradPlot <- ggplot(flux_grad_wcOnly,
            x = min(flux_grad_wcOnly$LateralDensityGrad, na.rm = TRUE),
            y = max(flux_grad_wcOnly$fluxN, na.rm = TRUE),
            label = pValue(N_meanGrad),
+           # label = pValue_l2(N_meanGrad_l2$P.param),
            hjust = 0, vjust = 3, size = 10) +
   annotate("text",
            x = min(flux_grad_wcOnly$LateralDensityGrad, na.rm = TRUE),
            y = max(flux_grad_wcOnly$fluxN, na.rm = TRUE),
            label = rSquared(N_meanGrad),
+           # label = rSquared_l2(N_meanGrad_l2$rsquare),
            hjust = 0, vjust = 5, size = 10) +
   scale_x_continuous(breaks = c(-0.04, -0.02, 0.00, 0.02, 0.04))+
   xlab(bquote('Lateral Density Gradient ('*kg~m^-3~km^-1*')'))+
-  ylab(bquote('PON Flux ('*mg~m^-2~day^-1*')'))+
+  ylab(bquote('PN Flux ('*mg~m^-2~day^-1*')'))+
   theme_classic()+
   theme(
     text= element_text(size = 20),
@@ -112,6 +149,9 @@ N_meanGradPlot
 chl_meanGrad <- lm(fluxChl ~ LateralDensityGrad, flux_grad_wcOnly)
 summary(chl_meanGrad)
 
+chl_meanGrad_l2 <- lmodel2(fluxChl ~ LateralDensityGrad, flux_grad_wcOnly)
+chl_meanGrad_l2
+
 chl_meanGradPlot <- ggplot(flux_grad_wcOnly,
                            aes(x = LateralDensityGrad,
                                y=fluxChl))+
@@ -121,6 +161,13 @@ chl_meanGradPlot <- ggplot(flux_grad_wcOnly,
               alpha=0,
               linewidth = 2,
               color = 'black')+
+  
+  # geom_abline(slope = chl_meanGrad_l2$regression.results[3,]$Slope,
+  #             intercept = chl_meanGrad_l2$regression.results[3,]$Intercept,
+  #             linewidth = 2,
+  #             linetype = 2,
+  #             color = 'gray')+
+  
   annotate("text",
            x = min(flux_grad_wcOnly$LateralDensityGrad, na.rm = TRUE),
            y = max(flux_grad_wcOnly$fluxChl, na.rm = TRUE),
@@ -130,11 +177,13 @@ chl_meanGradPlot <- ggplot(flux_grad_wcOnly,
            x = min(flux_grad_wcOnly$LateralDensityGrad, na.rm = TRUE),
            y = max(flux_grad_wcOnly$fluxChl, na.rm = TRUE),
            label = pValue(chl_meanGrad),
+           # label = pValue_l2(chl_meanGrad_l2$P.param),
            hjust = 0, vjust = 3, size = 10) +
   annotate("text",
            x = min(flux_grad_wcOnly$LateralDensityGrad, na.rm = TRUE),
            y = max(flux_grad_wcOnly$fluxChl, na.rm = TRUE),
            label = rSquared(chl_meanGrad),
+           # label = rSquared_l2(chl_meanGrad_l2$rsquare),
            hjust = 0, vjust = 5, size = 10) +
   scale_x_continuous(breaks = c(-0.04, -0.02, 0.00, 0.02, 0.04))+
   xlab(bquote('Lateral Density Gradient ('*kg~m^-3~km^-1*')'))+
