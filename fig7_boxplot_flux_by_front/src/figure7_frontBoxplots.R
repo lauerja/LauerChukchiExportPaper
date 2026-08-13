@@ -38,7 +38,7 @@ pocFront <- ggplot(data_prepped,
                      labels=c('ice' = 'UI',
                               'miz' = 'MIZ',
                               'ow' = 'OW'))+
-  labs(x = NULL, y = bquote('POC Flux ('*mg~m^-2~day^-1*')'))+
+  labs(x = NULL, y = bquote('POC Flux ('*mg~m^-2~d^-1*')'))+
   theme_classic()+
   theme(text = element_text(size = 16),
         panel.background = element_rect(fill = "transparent", color = NA),
@@ -59,7 +59,7 @@ ponFront <- ggplot(data_prepped,
            x = -Inf, y = Inf,
            label = "c",
            hjust = -1, vjust = 1, size = 10) +
-  labs(x = NULL, y = bquote('PN Flux ('*mg~m^-2~day^-1*')'))+
+  labs(x = NULL, y = bquote('PN Flux ('*mg~m^-2~d^-1*')'))+
   scale_fill_manual(values = c(
     "ice" = "#d63a41",
     # "miz" = "#FCCE50",
@@ -93,7 +93,7 @@ chlFront <- ggplot(data_prepped,
            x = -Inf, y = Inf,
            label = "a",
            hjust = -1, vjust = 1, size = 10) +
-  labs(x = NULL, y = bquote('Chlorophyll '*italic(a)*' Flux ('*mg~m^-2~day^-1*')'))+
+  labs(x = NULL, y = bquote('Chlorophyll '*italic(a)*' Flux ('*mg~m^-2~d^-1*')'))+
   scale_fill_manual(values = c(
     "ice" = "#d63a41",
     # "miz" = "#FCCE50",
@@ -147,4 +147,29 @@ chlFront_anova <- aov(fluxChl ~ statsGroup,
                       data = data_prepped)
 summary(chlFront_anova)
 TukeyHSD(chlFront_anova)
+
+
+#### Combine into single figure using Patchwork ####
+library(patchwork)
+
+ponFront_legend <- ponFront +
+  labs(fill = NULL,
+       color = NULL)+
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.8, 0.9),
+        # legend.key.size = unit(0.05, "npc"),
+        legend.text = element_text(size = 22.5))
+ponFront_legend
+
+
+pocFront_noLegend <- pocFront + theme(legend.position = 'none')
+
+
+patchPlot <- chlFront + pocFront_noLegend + ponFront_legend
+patchPlot
+
+ggsave("../plot/boxplot_fluxByFront_multipanel.png", 
+       plot = patchPlot, 
+       width = 13.5, height = 6, dpi = 600, 
+       bg = "transparent")
 

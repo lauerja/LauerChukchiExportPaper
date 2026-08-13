@@ -25,7 +25,7 @@ chl_boxplot <- ggplot(data = flux_grad,
                             'miz' = 'Marginal Ice\nZone',
                             'ow' = 'Open\nWater'))+
   labs(x = NULL, #'Deployment Station Ice Coverage',
-       y = bquote('Chl '*italic(a)*' Flux ('*mg~m^-2*~day^-1*')'),
+       y = bquote('Chl '*italic(a)*' Flux ('*mg~m^-2*~d^-1*')'),
        color = 'Trap Depth')+
   theme_classic()+
   theme(
@@ -57,7 +57,7 @@ c_boxplot <- ggplot(flux_grad,
                             'miz' = 'Marginal Ice\nZone',
                             'ow' = 'Open\nWater'))+
   labs(x = NULL, #'Deployment Station Ice Coverage',
-       y = bquote('POC Flux ('*mg~m^-2*~day^-1*')'),
+       y = bquote('POC Flux ('*mg~m^-2*~d^-1*')'),
        color = 'Trap Depth')+
   theme_classic()+
   theme(
@@ -89,7 +89,7 @@ n_boxplot <- ggplot(flux_grad,
                             'miz' = 'Marginal Ice\nZone',
                             'ow' = 'Open\nWater'))+
   labs(x = NULL, #'Deployment Station Ice Coverage',
-       y = bquote('PN Flux ('*mg~m^-2*~day^-1*')'),
+       y = bquote('PN Flux ('*mg~m^-2*~d^-1*')'),
        color = 'Trap Depth')+
   theme_classic()+
   theme(
@@ -116,3 +116,14 @@ ggsave(plot = n_boxplot,
        height = 6, width = 4.5, dpi = 600,
        # height = 7, width = 6, dpi = 600,
        bg = 'transparent')
+
+#### Combine into single figure using Patchwork ####
+library(patchwork)
+
+patchPlot <- chl_boxplot + c_boxplot + n_boxplot
+patchPlot
+
+ggsave("../plot/boxplot_flux_iceObs_multipanel.png", 
+       plot = patchPlot, 
+       width = 13.5, height = 6, dpi = 600, 
+       bg = "transparent")

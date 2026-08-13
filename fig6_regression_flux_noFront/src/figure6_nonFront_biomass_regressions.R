@@ -209,7 +209,7 @@ fluxChl_diChl_noFront_plot <- ggplot(wcTrapData,
            hjust = 1, vjust = 3, size = 10)+
   # xlab(bquote('\nDepth Integrated Chl '*italic(a)*'\n Above Trap ('*mg~m^-2*')'))+
   xlab(expression(atop("Depth Integrated Chl "*italic(a)*" Above Trap", "("*mg~m^-2*")")))+
-  ylab(bquote('Chl '*italic(a)*' Flux ('*mg~m^-2~day^-1*')'))+
+  ylab(bquote('Chl '*italic(a)*' Flux ('*mg~m^-2~d^-1*')'))+
   scale_color_manual(values = c('black', 'orange'))+
   theme_classic()+
   theme(
@@ -261,7 +261,7 @@ fluxC_diPOC_noFront_plot <- ggplot(wcTrapData,
            hjust = 1, vjust = 3, size = 10)+
   # xlab(bquote('Depth Integrated POC Above Trap ('*mg~m^-2*')'))+
   xlab(expression(atop("Depth Integrated POC Above Trap", "("*mg~m^-2*")")))+
-  ylab(bquote('POC Flux ('*mg~m^-2~day^-1*')'))+
+  ylab(bquote('POC Flux ('*mg~m^-2~d^-1*')'))+
   scale_color_manual(values = c('black', 'orange'))+
   theme_classic()+
   theme(
@@ -316,7 +316,7 @@ fluxN_diPON_noFront_plot <- ggplot(wcTrapData,
   #          hjust = 1, vjust = 3, size = 10)+
   # xlab(bquote('Depth Integrated PON Above Trap ('*mg~m^-2*')'))+
   xlab(expression(atop("Depth Integrated PN Above Trap", "("*mg~m^-2*")")))+
-  ylab(bquote('PN Flux ('*mg~m^-2~day^-1*')'))+
+  ylab(bquote('PN Flux ('*mg~m^-2~d^-1*')'))+
   labs(color = NULL)+
   scale_color_manual(values = c('black', 'orange'),
                      labels = c('TRUE'='Inside Front', 'FALSE'='Outside Front'))+
@@ -325,8 +325,12 @@ fluxN_diPON_noFront_plot <- ggplot(wcTrapData,
     text= element_text(size = 20),
     panel.background = element_rect(fill = "transparent", color = NA),
     plot.background = element_rect(fill = "transparent", color = NA),
-    legend.background = element_rect(fill = "transparent", color = NA),
-    legend.box.background = element_rect(fill = "transparent", color = NA)
+    legend.background = element_rect(fill = "transparent", color = 'black'),
+    legend.box.background = element_rect(fill = "transparent", color = NA),
+    legend.position = "inside",
+    legend.position.inside = c(0.75, 0.9),
+    # legend.key.size = unit(0.05, "npc"),
+    legend.text = element_text(size = 22.5)
   )
 fluxN_diPON_noFront_plot
 
@@ -340,3 +344,14 @@ ggsave("../plot/regression_pon_by_diPON_noFront_withKey.png",
        width = 7, height = 6, dpi = 600, 
        bg = "transparent")
 
+#### Combine Plots with Patchwork ####
+library(patchwork)
+
+patchPlot <- fluxChl_diChl_noFront_plot + fluxC_diPOC_noFront_plot + fluxN_diPON_noFront_plot
+patchPlot
+
+ggsave("../plot/regression_biomass_noFront_multipanel.png", 
+       plot = patchPlot, 
+       width = 18, height = 6, dpi = 600, 
+       bg = "transparent")
+ 
