@@ -226,55 +226,27 @@ ggsave('../plot/boxplot_diChl.png', atChl, width = 4.5, height = 6, dpi = 600)
 
 
 
-depth_integration_table <- wcTrapData_long%>%
-  group_by(iceObs, variable, integration_depth_pretty)%>%
-  summarize(mean = mean(value),
-            sd = sd(value))%>%
-  pivot_wider(names_from = variable, values_from = c(mean, sd))
+#### Combine Plots with Patchwork ####
+library(patchwork)
+
+atN_legend_centered <- atN +
+  labs(fill = NULL,
+       color = NULL)+
+  theme(    legend.position = "inside",
+            legend.position.inside = c(0.4, 0.9),
+            # legend.key.size = unit(0.05, "npc"),
+            legend.text = element_text(size = 22.5))
+atN_legend_centered
 
 
-## Does Pattern Hold for Shallow Traps (yes to all) ####
-depthStats_shallow <- wcTrapData_long %>%
-  filter(integration_depth != 'full',
-         Trap_Depth <= 20)%>%
-  pivot_wider(names_from = variable, values_from = value)
+atC_noLegend <- atC + theme(legend.position = 'none')
 
-kruskal.test(POC ~ iceObs, depthStats_shallow)
-pairwise.wilcox.test(depthStats_shallow$POC, depthStats_shallow$iceObs)
+patchPlot <- atChl + atC_noLegend + atN_legend_centered
+patchPlot
 
-kruskal.test(PON ~ iceObs, depthStats_shallow)
-pairwise.wilcox.test(depthStats_shallow$PON, depthStats_shallow$iceObs)
+ggsave("../plot/boxplot_di_multipanel.png",
+       plot = patchPlot,
+       width = 13.5, height = 6, dpi = 600,
+       bg = "transparent")
 
-kruskal.test(Chl ~ iceObs, depthStats_shallow)
-pairwise.wilcox.test(depthStats_shallow$Chl, depthStats_shallow$iceObs)
-
-
-### For Deep? ####
-depthStats_deep <- wcTrapData_long %>%
-  filter(integration_depth != 'full',
-         Trap_Depth > 20)%>%
-  pivot_wider(names_from = variable, values_from = value)
-
-kruskal.test(POC ~ iceObs, depthStats_deep)
-pairwise.wilcox.test(depthStats_deep$POC, depthStats_deep$iceObs)
-
-kruskal.test(PON ~ iceObs, depthStats_deep)
-pairwise.wilcox.test(depthStats_deep$PON, depthStats_deep$iceObs)
-
-kruskal.test(Chl ~ iceObs, depthStats_deep)
-pairwise.wilcox.test(depthStats_deep$Chl, depthStats_deep$iceObs)
-
-## Full Water Column ####
-
-kruskal.test(dipoc_full_waterCol_mg_m2 ~ iceObs, wcBiomass_trapStations)
-pairwise.wilcox.test(wcBiomass_trapStations$dipoc_full_waterCol_mg_m2,
-                     wcBiomass_trapStations$iceObs)
-
-kruskal.test(dipon_full_waterCol_mg_m2 ~ iceObs, wcBiomass_trapStations)
-pairwise.wilcox.test(wcBiomass_trapStations$dipon_full_waterCol_mg_m2,
-                     wcBiomass_trapStations$iceObs)
-
-kruskal.test(dichlMean_full_waterCol_mg_m2 ~ iceObs, wcBiomass_trapStations)
-pairwise.wilcox.test(wcBiomass_trapStations$dichlMean_full_waterCol_mg_m2,
-                     wcBiomass_trapStations$iceObs)
 

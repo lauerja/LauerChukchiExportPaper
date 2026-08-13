@@ -88,7 +88,7 @@ C_meanGradPlot <- ggplot(flux_grad_wcOnly,
            hjust = 0, vjust = 5, size = 10) +
   scale_x_continuous(breaks = c(-0.04, -0.02, 0.00, 0.02, 0.04))+
   xlab(bquote('Lateral Density Gradient ('*kg~m^-3~km^-1*')'))+
-  ylab(bquote('POC Flux ('*mg~m^-2~day^-1*')'))+
+  ylab(bquote('POC Flux ('*mg~m^-2~d^-1*')'))+
   theme_classic()+
   theme(
     text= element_text(size = 20),
@@ -134,7 +134,7 @@ N_meanGradPlot <- ggplot(flux_grad_wcOnly,
            hjust = 0, vjust = 5, size = 10) +
   scale_x_continuous(breaks = c(-0.04, -0.02, 0.00, 0.02, 0.04))+
   xlab(bquote('Lateral Density Gradient ('*kg~m^-3~km^-1*')'))+
-  ylab(bquote('PN Flux ('*mg~m^-2~day^-1*')'))+
+  ylab(bquote('PN Flux ('*mg~m^-2~d^-1*')'))+
   theme_classic()+
   theme(
     text= element_text(size = 20),
@@ -187,7 +187,7 @@ chl_meanGradPlot <- ggplot(flux_grad_wcOnly,
            hjust = 0, vjust = 5, size = 10) +
   scale_x_continuous(breaks = c(-0.04, -0.02, 0.00, 0.02, 0.04))+
   xlab(bquote('Lateral Density Gradient ('*kg~m^-3~km^-1*')'))+
-  ylab(bquote('Chl '*italic(a)*' Flux ('*mg~m^-2~day^-1*')'))+
+  ylab(bquote('Chl '*italic(a)*' Flux ('*mg~m^-2~d^-1*')'))+
   theme_classic()+
   theme(
     text= element_text(size = 20),
@@ -212,4 +212,16 @@ ggsave("../plot/regression_pon_by_meanGrad.png",
 ggsave("../plot/regression_chla_by_meanGrad.png", 
        plot = chl_meanGradPlot, 
        width = 6, height = 6, dpi = 600, 
+       bg = "transparent")
+
+
+#### Combine into single figure using Patchwork ####
+library(patchwork)
+
+patchPlot <- chl_meanGradPlot + C_meanGradPlot + N_meanGradPlot
+patchPlot
+
+ggsave("../plot/regression_fluxByGrad_multipanel.png", 
+       plot = patchPlot, 
+       width = 18, height = 6, dpi = 600, 
        bg = "transparent")
